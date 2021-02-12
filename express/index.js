@@ -2,74 +2,7 @@ const HOSTNAME = "localhost";
 const PORT_EXPRESS = 2999;
 const PORT_GANACHE = 8545;
 const contractAddress = "0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab";
-const abi = [
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes4",
-				"name": "symbol",
-				"type": "bytes4"
-			}
-		],
-		"name": "getStockPrice",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes4",
-				"name": "symbol",
-				"type": "bytes4"
-			}
-		],
-		"name": "getStockVolume",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes4",
-				"name": "symbol",
-				"type": "bytes4"
-			},
-			{
-				"internalType": "uint256",
-				"name": "price",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "volume",
-				"type": "uint256"
-			}
-		],
-		"name": "setStock",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	}
-];
+const { abi } = require("./abi.js");
 
 const Web3 = require("web3");
 const express = require("express");
@@ -81,7 +14,7 @@ let accounts;
 provider.eth.getAccounts().then(acc => accounts = acc);
 
 const StockPrices = new provider.eth.Contract(abi, contractAddress);
-console.log(StockPrices ? "contract init sucess" : "contract init fail");
+console.log(StockPrices._address === contractAddress ? "contract init sucess" : "contract init fail");
 
 const app = new express();
 app.use(cors());
@@ -91,7 +24,7 @@ app.get("/price", async (req, res, next) => {
   const urlQuery = url.parse(req.url, true).query;
   console.log("urlQuery:", urlQuery);
   
-  console.log("StockPrices");
+  console.log("StockPrices:");
 	console.log(StockPrices);
 	
 	const price = await StockPrices.methods.getStockPrice(urlQuery.sym).call({ from: accounts[0] })
